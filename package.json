@@ -1,0 +1,45 @@
+{
+  "name": "dl",
+  "description": "Download the log and open in text editor ",
+  "version": "0.0.0",
+  "author": "thet @thetpaingtun93",
+  "bin": {
+    "dlog": "./bin/run"
+  },
+  "bugs": "https://github.com///issues",
+  "dependencies": {
+    "@oclif/command": "^1.5.18",
+    "@oclif/config": "^1.13.3",
+    "@oclif/plugin-help": "^2.2.1",
+    "@oclif/plugin-not-found": "^1.2.3"
+  },
+  "devDependencies": {
+    "eslint": "^5.14.1",
+    "eslint-config-oclif": "^3.1.0",
+    "rimraf": "^3.0.0"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "files": [
+    "/bin",
+    "/src"
+  ],
+  "homepage": "https://github.com//",
+  "keywords": [
+    "oclif"
+  ],
+  "license": "MIT",
+  "main": "src/index.js",
+  "oclif": {
+    "bin": "dlog",
+    "plugins": [
+      "@oclif/plugin-not-found"
+    ]
+  },
+  "repository": "/",
+  "scripts": {
+    "posttest": "eslint .",
+    "test": "echo NO TESTS"
+  }
+}
