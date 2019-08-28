@@ -12,7 +12,8 @@
     "@oclif/config": "^1.13.3",
     "@oclif/plugin-help": "^2.2.1",
     "@oclif/plugin-not-found": "^1.2.3",
-    "puppeteer": "^1.19.0"
+    "puppeteer": "^1.19.0",
+    "shelljs": "^0.8.3"
   },
   "devDependencies": {
     "eslint": "^5.14.1",
