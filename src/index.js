@@ -5,6 +5,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const puppeteer = require('puppeteer')
 const shell = require('shelljs')
+const Zip = require('adm-zip')
 
 // eslint-disable-next-line padded-blocks
 class DlCommand extends Command {
@@ -15,27 +16,30 @@ class DlCommand extends Command {
     const name = flags.name || 'world'
     this.log(`hello ${name} from .\\src\\index1.js`)
 
-    // const configJson = await fs.readJson(path.join(this.config.configDir, 'config.json'))
-    // this.log(`config => ${configJson.path}`)
+    const configJson = await fs.readJson(path.join(this.config.configDir, 'config.json'))
 
-    this.log('hello')
-
+    this.downloadPath = configJson.downloadPath
+    this.fileName = configJson.fileName
+    this.openCmd = configJson.fileOpenCmd
 
     // shell.exec('"C:\\Program Files\\Sublime Text 3\\subl.exe" C:\\Users\\user\\Desktop\\asoft.txt')
 
+    this.log('downloading log file ...')
+    await this.downloadLog()
+    this.log('log file dowloaded')
 
-    // this.log('completed')
+    await this.unzipDownloadedLog()
+    this.log('unzipped log file')
 
-
-
-
-
-
-    this.browse()
+    this.openLogFile()
   }
 
+  openLogFile() {
+    const fullPath = `${this.downloadPath}${this.fileName}`
+    shell.exec(`${this.openCmd} ${fullPath}`)
+  }
 
-  async browse() {
+  async downloadLog() {
     const browser = await puppeteer.launch({ headless: true })
     const page = await browser.newPage()
     await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/login')
@@ -58,38 +62,40 @@ class DlCommand extends Command {
     await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/log/list')
 
 
-    await page.setRequestInterception(true)
-
-    await page.on('request', request => {
-      if (request.resourceType() === 'document') {
-
-
-
-      }
-
-      request.continue()
-    })
-
-    await page.on('response', (response) => {
-
-    })
-
     await page._client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
-      downloadPath: './'
+      downloadPath: this.downloadPath
     });
 
-    const links = await page.$x("//a[contains(., 'valyou.log')]")
+
+    const logLinkXpath = `//a[contains(., '${this.fileName}')]`
+    const links = await page.$x(logLinkXpath)
     const logLinks = links[0]
 
-    await logLinks.click()
 
-    await page.waitForNavigation({waitUntil:'networkidle2'})
+    await Promise.all([
+      await logLinks.click(),
+      page.waitForResponse(respose => respose.ok())
+    ])
 
     await page.screenshot({ path: 'example.png' })
 
 
     await browser.close()
+  }
+
+  unzipDownloadedLog() {
+    const zipFile = `${this.downloadPath}${this.fileName}.zip`
+    const zip = new Zip(zipFile)
+
+    return new Promise((resolve, reject) => {
+      try {
+        zip.extractAllTo(this.downloadPath,true)
+        resolve()
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 }
 
