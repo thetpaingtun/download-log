@@ -18,6 +18,7 @@ class DlCommand extends Command {
     // const configJson = await fs.readJson(path.join(this.config.configDir, 'config.json'))
     // this.log(`config => ${configJson.path}`)
 
+    this.log('hello')
 
 
     // shell.exec('"C:\\Program Files\\Sublime Text 3\\subl.exe" C:\\Users\\user\\Desktop\\asoft.txt')
