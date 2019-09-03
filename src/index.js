@@ -21,6 +21,8 @@ class DlCommand extends Command {
     this.downloadPath = configJson.downloadPath
     this.fileName = configJson.fileName
     this.openCmd = configJson.fileOpenCmd
+    this.username = configJson.username
+    this.password = configJson.password
 
     // shell.exec('"C:\\Program Files\\Sublime Text 3\\subl.exe" C:\\Users\\user\\Desktop\\asoft.txt')
 
@@ -36,7 +38,8 @@ class DlCommand extends Command {
 
   openLogFile() {
     const fullPath = `${this.downloadPath}${this.fileName}`
-    shell.exec(`${this.openCmd} ${fullPath}`)
+    this.log(`opening : ${fullPath}`)
+    shell.exec(`"${this.openCmd}" ${fullPath}`)
   }
 
   async downloadLog() {
@@ -44,11 +47,11 @@ class DlCommand extends Command {
     const page = await browser.newPage()
     await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/login')
 
-    await page.type('#username', 'admin')
+    await page.type('#username', this.username)
 
     const edts = await page.$x('//*[@id="main"]/form/input[2]')
     const edtPass = edts[0]
-    await edtPass.type('admin')
+    await edtPass.type(this.password)
 
 
     const btns = await page.$x('//*[@id="main"]/form/button')
@@ -90,7 +93,7 @@ class DlCommand extends Command {
 
     return new Promise((resolve, reject) => {
       try {
-        zip.extractAllTo(this.downloadPath,true)
+        zip.extractAllTo(this.downloadPath, true)
         resolve()
       } catch (e) {
         reject(e)
