@@ -41,10 +41,10 @@ class DlCommand extends Command {
 
   clearDownloadpath() {
     return new Promise((resolve, reject) => {
-      try{  
+      try {
         fsExtra.emptyDirSync(this.downloadPath)
         resolve(true)
-      }catch(e){
+      } catch (e) {
         reject(e)
       }
     })
@@ -59,7 +59,10 @@ class DlCommand extends Command {
   async downloadLog() {
     const browser = await puppeteer.launch({ headless: true })
     const page = await browser.newPage()
-    await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/login')
+    // await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/login')
+
+    await page.goto('https://ekyc.valyou.com.my/valyou/admin/login')
+
 
     await page.type('#username', this.username)
 
@@ -75,7 +78,12 @@ class DlCommand extends Command {
       btnLogin.click()
     ])
 
-    await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/log/list')
+    // await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/log/list')
+
+    await page.goto('https://ekyc.valyou.com.my/valyou/admin/log/list')
+
+
+
 
 
     await page._client.send('Page.setDownloadBehavior', {
@@ -87,6 +95,10 @@ class DlCommand extends Command {
     const logLinkXpath = `//a[contains(., '${this.fileName}')]`
     const links = await page.$x(logLinkXpath)
     const logLinks = links[0]
+
+
+
+    this.log(JSON.stringify(logLinks))
 
 
     await Promise.all([
