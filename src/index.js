@@ -14,7 +14,6 @@ class DlCommand extends Command {
     const { flags } = this.parse(DlCommand)
     const { args } = this.parse(DlCommand)
     const name = flags.name || 'world'
-    this.log(`hello ${name} from .\\src\\index1.js`)
 
     const configJson = await fs.readJson(path.join(this.config.configDir, 'config.json'))
 

@@ -1,7 +1,7 @@
 {
   "name": "dl",
   "description": "Download the log and open in text editor ",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "author": "thet @thetpaingtun93",
   "bin": {
     "dlog": "./bin/run"
