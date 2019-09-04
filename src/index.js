@@ -1,11 +1,10 @@
-/* eslint-disable comma-dangle */
-/* eslint-disable object-curly-spacing */
 const { Command, flags } = require('@oclif/command')
 const fs = require('fs-extra')
 const path = require('path')
 const puppeteer = require('puppeteer')
 const shell = require('shelljs')
 const Zip = require('adm-zip')
+const fsExtra = require('fs-extra')
 
 // eslint-disable-next-line padded-blocks
 class DlCommand extends Command {
@@ -25,6 +24,10 @@ class DlCommand extends Command {
 
     // shell.exec('"C:\\Program Files\\Sublime Text 3\\subl.exe" C:\\Users\\user\\Desktop\\asoft.txt')
 
+
+    this.log('clearing previous logs ...')
+    await this.clearDownloadpath()
+
     this.log('downloading log file ...')
     await this.downloadLog()
     this.log('log file dowloaded')
@@ -33,6 +36,18 @@ class DlCommand extends Command {
     this.log('unzipped log file')
 
     this.openLogFile()
+  }
+
+
+  clearDownloadpath() {
+    return new Promise((resolve, reject) => {
+      try{  
+        fsExtra.emptyDirSync(this.downloadPath)
+        resolve(true)
+      }catch(e){
+        reject(e)
+      }
+    })
   }
 
   openLogFile() {
@@ -51,7 +66,6 @@ class DlCommand extends Command {
     const edts = await page.$x('//*[@id="main"]/form/input[2]')
     const edtPass = edts[0]
     await edtPass.type(this.password)
-
 
     const btns = await page.$x('//*[@id="main"]/form/button')
     const btnLogin = btns[0]
@@ -77,13 +91,32 @@ class DlCommand extends Command {
 
     await Promise.all([
       await logLinks.click(),
-      page.waitForResponse(respose => respose.ok())
+      await this.waitForFileDownload()
     ])
 
     await page.screenshot({ path: 'example.png' })
 
 
     await browser.close()
+  }
+
+  waitForFileDownload() {
+    return new Promise((resolve, reject) => {
+      try {
+        let fileName;
+        while (!fileName || fileName.endsWith('crdownload')) {
+          const fileList = fs.readdirSync(this.downloadPath)
+
+          if (fileList) {
+            fileName = fileList[0]
+          }
+          // this.log(fileName)
+        }
+        resolve(true)
+      } catch (e) {
+        reject(e)
+      }
+    })
   }
 
   unzipDownloadedLog() {

@@ -13,6 +13,7 @@
     "@oclif/plugin-help": "^2.2.1",
     "@oclif/plugin-not-found": "^1.2.3",
     "adm-zip": "^0.4.13",
+    "fs-extra": "^8.1.0",
     "puppeteer": "^1.19.0",
     "shelljs": "^0.8.3"
   },
