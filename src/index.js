@@ -14,13 +14,37 @@ class DlCommand extends Command {
     const { args } = this.parse(DlCommand)
     const name = flags.name || 'world'
 
-    const configJson = await fs.readJson(path.join(this.config.configDir, 'config.json'))
+    let configFileName = 'config'
+    let day = null
+
+    if (args.first && isNaN(args.first)) {
+      configFileName = args.first
+    } else {
+      day = args.first
+    }
+
+
+    if (args.second) {
+      day = args.second
+    }
+
+    const configFile = `${configFileName}.json`
+
+
+    const configJson = await fs.readJson(path.join(this.config.configDir, configFile))
 
     this.downloadPath = configJson.downloadPath
-    this.fileName = configJson.fileName
     this.openCmd = configJson.fileOpenCmd
     this.username = configJson.username
     this.password = configJson.password
+    this.loginPath = configJson.loginPath
+    this.logListPath = configJson.logListPath
+    this.prefix = configJson.prefixFileName
+    this.postfix = configJson.postfixFileName
+
+    this.fileName = this.getFileNameToDownload(configJson.fileName, day, this.prefix)
+
+    this.log(this.fileName)
 
     // shell.exec('"C:\\Program Files\\Sublime Text 3\\subl.exe" C:\\Users\\user\\Desktop\\asoft.txt')
 
@@ -28,7 +52,7 @@ class DlCommand extends Command {
     this.log('clearing previous logs ...')
     await this.clearDownloadpath()
 
-    this.log('downloading log file ...')
+    this.log(`downloading ${this.fileName} ...`)
     await this.downloadLog()
     this.log('log file dowloaded')
 
@@ -38,6 +62,26 @@ class DlCommand extends Command {
     this.openLogFile()
   }
 
+  getFileNameToDownload(defaultFileName, day, prefix) {
+    const today = new Date()
+    if (day) {
+      let month = today.getMonth() + 1
+      const year = today.getFullYear()
+
+      if (month < 10) {
+        month = `0${month}`
+      }
+
+      if (day < 10) {
+        day = `0${day}`
+      }
+
+      // valyou.2019-08-18.log.zip
+      return `${prefix}.${year}-${month}-${day}.log${this.postfix}`
+    }
+
+    return defaultFileName
+  }
 
   clearDownloadpath() {
     return new Promise((resolve, reject) => {
@@ -51,7 +95,10 @@ class DlCommand extends Command {
   }
 
   openLogFile() {
-    const fullPath = `${this.downloadPath}${this.fileName}`
+
+    const fileName = this.fileName.replace('.zip', '')
+
+    const fullPath = `${this.downloadPath}${fileName}`
     this.log(`opening : ${fullPath}`)
     shell.exec(`"${this.openCmd}" ${fullPath}`)
   }
@@ -59,9 +106,7 @@ class DlCommand extends Command {
   async downloadLog() {
     const browser = await puppeteer.launch({ headless: true })
     const page = await browser.newPage()
-    // await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/login')
-
-    await page.goto('https://ekyc.valyou.com.my/valyou/admin/login')
+    await page.goto(`${this.loginPath}`)
 
 
     await page.type('#username', this.username)
@@ -78,13 +123,7 @@ class DlCommand extends Command {
       btnLogin.click()
     ])
 
-    // await page.goto('http://innov8tifip.ddns.net:9086/valyou/admin/log/list')
-
-    await page.goto('https://ekyc.valyou.com.my/valyou/admin/log/list')
-
-
-
-
+    await page.goto(`${this.logListPath}`)
 
     await page._client.send('Page.setDownloadBehavior', {
       behavior: 'allow',
@@ -92,13 +131,11 @@ class DlCommand extends Command {
     });
 
 
-    const logLinkXpath = `//a[contains(., '${this.fileName}')]`
+    // const logLinkXpath = `//a[starts-with(., '${this.fileName}')]`
+
+    const logLinkXpath = `//a[text() ='${this.fileName}']`
     const links = await page.$x(logLinkXpath)
     const logLinks = links[0]
-
-
-
-    this.log(JSON.stringify(logLinks))
 
 
     await Promise.all([
@@ -132,7 +169,9 @@ class DlCommand extends Command {
   }
 
   unzipDownloadedLog() {
-    const zipFile = `${this.downloadPath}${this.fileName}.zip`
+    const fileName = this.fileName.replace('.zip', '')
+
+    const zipFile = `${this.downloadPath}${fileName}.zip`
     const zip = new Zip(zipFile)
 
     return new Promise((resolve, reject) => {
@@ -154,8 +193,9 @@ Extra documentation goes here
 `
 
 DlCommand.args = [
-  { name: 'firstFlag' },
-  { name: 'secondFlag' },
+  { name: 'first', },
+  { name: 'second' }
+
 ]
 
 DlCommand.flags = {
@@ -163,7 +203,7 @@ DlCommand.flags = {
   version: flags.version({ char: 'v' }),
   // add --help flag to show CLI version
   help: flags.help({ char: 'h' }),
-  name: flags.string({ char: 'n', description: 'name to print' }),
+  name: flags.string({ char: 'n', description: 'name to print' })
 }
 
 module.exports = DlCommand
