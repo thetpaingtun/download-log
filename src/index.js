@@ -44,8 +44,6 @@ class DlCommand extends Command {
 
     this.fileName = this.getFileNameToDownload(configJson.fileName, day, this.prefix)
 
-    this.log(this.fileName)
-
     // shell.exec('"C:\\Program Files\\Sublime Text 3\\subl.exe" C:\\Users\\user\\Desktop\\asoft.txt')
 
 
