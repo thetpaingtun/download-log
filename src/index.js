@@ -4,7 +4,6 @@ const path = require("path");
 const puppeteer = require("puppeteer");
 const shell = require("shelljs");
 const Zip = require("adm-zip");
-const fsExtra = require("fs-extra");
 const moment = require("moment");
 
 // eslint-disable-next-line padded-blocks
@@ -92,7 +91,7 @@ class DlCommand extends Command {
   clearDownloadpath() {
     return new Promise((resolve, reject) => {
       try {
-        fsExtra.emptyDirSync(this.downloadPath);
+        fs.emptyDirSync(this.downloadPath);
         resolve(true);
       } catch (e) {
         reject(e);
@@ -148,16 +147,17 @@ class DlCommand extends Command {
   }
 
   waitForFileDownload() {
-    return new Promise((resolve, reject) => {
+    return new Promise(async (resolve, reject) => {
       try {
         let fileName;
         while (!fileName || fileName.endsWith("crdownload")) {
           const fileList = fs.readdirSync(this.downloadPath);
+          await new Promise(r => setTimeout(r, 100));
+
 
           if (fileList) {
             fileName = fileList[0];
           }
-          // this.log(fileName)
         }
         resolve(true);
       } catch (e) {
