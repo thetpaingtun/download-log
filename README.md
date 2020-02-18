@@ -23,6 +23,6 @@ Download the log and open in text editor
 dlog project {date} 
 
 eg. `dlog valyou`
-eg. `dlog fn 11`
+`dlog fn 11`
 
 
