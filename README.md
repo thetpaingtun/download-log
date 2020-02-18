@@ -10,10 +10,14 @@ Download the log and open in text editor
 
 # Installation
 
-1. Download () and install.
-2. Add your-full-path to system path
-3. Download the config file from () and put them under ()
-3. Update configuration file
+1. Download dlog.zip from https://github.com/thetpaingtun/download-log/releases/tag/v0.1.0 
+2. Double click on dlog-v0.1.0.exe to install 
+3. Add `the-path-you-install\dlog-v0.1.0\dlog\bin` to system path
+4. Create a folder name `dl` under C:\Users\username\AppData\Local\
+5. Copy the config files to the dl folder 
+6. Update the config files accordingly
+
+
 
 <!-- toc -->
 # Usage
