@@ -18,9 +18,11 @@ Download the log and open in text editor
 6. Update the config files accordingly
 
 
-
-<!-- toc -->
 # Usage
-<!-- usage -->
-# Commands
-<!-- commands -->
+
+dlog project {date} 
+
+eg. `dlog valyou`
+eg. `dlog fn 11`
+
+
